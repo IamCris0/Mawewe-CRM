@@ -1,12 +1,17 @@
-import { Component, signal } from '@angular/core';
+// src/app/app.ts
+import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-root',
   imports: [RouterOutlet],
-  templateUrl: './app.html',
-  styleUrl: './app.css'
+  template: '<router-outlet />',
+  styles: [`
+    :host {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+  `]
 })
-export class App {
-  protected readonly title = signal('MAWEWE-CRM');
-}
+export class App {}

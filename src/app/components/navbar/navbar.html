@@ -1,1 +1,64 @@
-<p>navbar works!</p>
+<div class="sidebar" [class.collapsed]="isCollapsed()">
+  <!-- Header -->
+  <div class="sidebar-header">
+    <div class="logo">
+      <div class="logo-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+      </div>
+      @if (!isCollapsed()) {
+        <span class="logo-text">MAWEWE CRM</span>
+      }
+    </div>
+    <button class="toggle-btn" (click)="toggleSidebar()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="3" y1="12" x2="21" y2="12"></line>
+        <line x1="3" y1="6" x2="21" y2="6"></line>
+        <line x1="3" y1="18" x2="21" y2="18"></line>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Menu Items -->
+  <nav class="sidebar-menu">
+    @for (item of menuItems; track item.route) {
+      <a 
+        [routerLink]="item.route" 
+        routerLinkActive="active"
+        class="menu-item"
+        [attr.title]="isCollapsed() ? item.label : null"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path [attr.d]="item.icon"></path>
+        </svg>
+        @if (!isCollapsed()) {
+          <span>{{ item.label }}</span>
+        }
+      </a>
+    }
+  </nav>
+
+  <!-- Footer -->
+  <div class="sidebar-footer">
+    <div class="user-info">
+      <div class="user-avatar">
+        {{ userEmail().charAt(0).toUpperCase() }}
+      </div>
+      @if (!isCollapsed()) {
+        <div class="user-details">
+          <span class="user-name">{{ userEmail() }}</span>
+          <button class="logout-btn" (click)="logout()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+              <polyline points="16 17 21 12 16 7"></polyline>
+              <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+            Salir
+          </button>
+        </div>
+      }
+    </div>
+  </div>
+</div>
