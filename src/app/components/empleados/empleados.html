@@ -1,1 +1,204 @@
-<p>empleados works!</p>
+<app-navbar></app-navbar>
+
+<div class="main-content">
+  <div class="container">
+    <!-- Header -->
+    <div class="page-header">
+      <div>
+        <h1>Empleados</h1>
+        <p>Gestiona el equipo de trabajo de MAWEWE</p>
+      </div>
+      <button class="btn-primary" (click)="openModal()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+        Nuevo Empleado
+      </button>
+    </div>
+
+    <!-- Filtros -->
+    <div class="filters-bar">
+      <div class="search-box">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"></circle>
+          <path d="m21 21-4.35-4.35"></path>
+        </svg>
+        <input 
+          type="text" 
+          placeholder="Buscar empleados..."
+          [(ngModel)]="searchTerm"
+        >
+      </div>
+      
+      <select [(ngModel)]="filterDepartamento" class="filter-select">
+        @for (depto of departamentos; track depto) {
+          <option [value]="depto">
+            {{ depto === 'todos' ? 'Todos los departamentos' : depto }}
+          </option>
+        }
+      </select>
+
+      <select [(ngModel)]="filterEstado" class="filter-select">
+        @for (estado of estados; track estado) {
+          <option [value]="estado">
+            {{ estado === 'todos' ? 'Todos los estados' : estado }}
+          </option>
+        }
+      </select>
+    </div>
+
+    <!-- Stats -->
+    <div class="mini-stats">
+      <div class="mini-stat">
+        <span class="mini-stat-value">{{ getTotalEmpleados() }}</span>
+        <span class="mini-stat-label">Total Empleados</span>
+      </div>
+      <div class="mini-stat">
+        <span class="mini-stat-value">{{ getEmpleadosActivos() }}</span>
+        <span class="mini-stat-label">Activos</span>
+      </div>
+      <div class="mini-stat">
+        <span class="mini-stat-value">{{ getEmpleadosPorDepartamento('Ventas') }}</span>
+        <span class="mini-stat-label">Ventas</span>
+      </div>
+      <div class="mini-stat">
+        <span class="mini-stat-value">{{ getEmpleadosPorDepartamento('Técnico') }}</span>
+        <span class="mini-stat-label">Técnico</span>
+      </div>
+    </div>
+
+    <!-- Tabla -->
+    <div class="card">
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Empleado</th>
+              <th>Cargo</th>
+              <th>Departamento</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (empleado of empleadosFiltrados(); track empleado.id) {
+              <tr>
+                <td>
+                  <div class="user-cell">
+                    <div class="avatar">{{ empleado.nombre.charAt(0) }}</div>
+                    <div>
+                      <div class="name">{{ empleado.nombre }}</div>
+                      <div class="email">{{ empleado.email }}</div>
+                    </div>
+                  </div>
+                </td>
+                <td>{{ empleado.cargo }}</td>
+                <td>
+                  <span class="dept-badge">{{ empleado.departamento }}</span>
+                </td>
+                <td>
+                  <span class="badge" [ngClass]="getEstadoClass(empleado.estado)">
+                    {{ empleado.estado }}
+                  </span>
+                </td>
+                <td>
+                  <div class="action-buttons">
+                    <button 
+                      class="btn-icon" 
+                      [class.active]="empleado.estado === 'activo'"
+                      (click)="cambiarEstado(empleado.id)" 
+                      [title]="empleado.estado === 'activo' ? 'Desactivar' : 'Activar'"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 11l3 3L22 4"></path>
+                        <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"></path>
+                      </svg>
+                    </button>
+                    <button class="btn-icon" title="Editar">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                      </svg>
+                    </button>
+                    <button class="btn-icon danger" (click)="eliminarEmpleado(empleado.id)" title="Eliminar">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                      </svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="5" class="empty-state">
+                  <div class="empty-icon">👥</div>
+                  <p>No se encontraron empleados</p>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+@if (showModal()) {
+  <div class="modal-overlay" (click)="closeModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Nuevo Empleado</h2>
+        <button class="btn-close" (click)="closeModal()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Nombre Completo *</label>
+          <input type="text" [(ngModel)]="nuevoEmpleado.nombre" placeholder="Ej: Juan Pérez">
+        </div>
+        
+        <div class="form-group">
+          <label>Email *</label>
+          <input type="email" [(ngModel)]="nuevoEmpleado.email" placeholder="ejemplo@mawewe.com">
+        </div>
+        
+        <div class="form-group">
+          <label>Cargo</label>
+          <input type="text" [(ngModel)]="nuevoEmpleado.cargo" placeholder="Ej: Vendedor">
+        </div>
+        
+        <div class="form-group">
+          <label>Departamento</label>
+          <select [(ngModel)]="nuevoEmpleado.departamento">
+            <option value="Ventas">Ventas</option>
+            <option value="Administración">Administración</option>
+            <option value="Técnico">Técnico</option>
+            <option value="Marketing">Marketing</option>
+            <option value="Finanzas">Finanzas</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label>Estado</label>
+          <select [(ngModel)]="nuevoEmpleado.estado">
+            <option value="activo">Activo</option>
+            <option value="inactivo">Inactivo</option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="modal-footer">
+        <button class="btn-secondary" (click)="closeModal()">Cancelar</button>
+        <button class="btn-primary" (click)="guardarEmpleado()">Guardar</button>
+      </div>
+    </div>
+  </div>
+}
