@@ -1,10 +1,9 @@
-/* src/app/components/prospectos/prospectos.css */
-.prospectos {
+/* src/app/components/empleados/empleados.css */
+.empleados {
   max-width: 1400px;
   margin: 0 auto;
 }
 
-/* Page Header */
 .page-header {
   display: flex;
   justify-content: space-between;
@@ -29,9 +28,9 @@
 .header-actions {
   display: flex;
   gap: 12px;
+  flex-wrap: wrap;
 }
 
-/* Stats Grid */
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -83,7 +82,6 @@
   font-size: 13px;
 }
 
-/* Filters */
 .filters-section {
   display: flex;
   gap: 15px;
@@ -139,7 +137,6 @@
   border-color: #667eea;
 }
 
-/* Table */
 .table-container {
   background: white;
   border-radius: 12px;
@@ -190,6 +187,13 @@
   gap: 12px;
 }
 
+.user-cell small {
+  display: block;
+  color: #94a3b8;
+  font-size: 12px;
+  margin-top: 2px;
+}
+
 .user-avatar {
   width: 40px;
   height: 40px;
@@ -204,15 +208,18 @@
   flex-shrink: 0;
 }
 
-.contact-cell {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+.badge {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
 }
 
-.contact-cell small {
-  color: #94a3b8;
-  font-size: 12px;
+.badge-dept {
+  background: #f1f5f9;
+  color: #475569;
 }
 
 .status-badge {
@@ -230,7 +237,34 @@
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
-/* Action Buttons */
+.performance-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.progress-bar {
+  flex: 1;
+  height: 8px;
+  background: #f1f5f9;
+  border-radius: 10px;
+  overflow: hidden;
+  min-width: 80px;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 10px;
+  transition: width 0.3s ease;
+}
+
+.performance-cell span {
+  font-size: 13px;
+  font-weight: 600;
+  color: #64748b;
+  min-width: 40px;
+}
+
 .action-buttons {
   display: flex;
   gap: 8px;
@@ -266,7 +300,6 @@
   height: 18px;
 }
 
-/* Empty State */
 .empty-state {
   padding: 80px 20px;
   text-align: center;
@@ -290,7 +323,6 @@
   font-size: 14px;
 }
 
-/* Modal */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -420,6 +452,7 @@
 .form-group select.error,
 .form-group textarea.error {
   border-color: #ef4444;
+  background: #fef2f2;
 }
 
 .form-group textarea {
@@ -431,6 +464,15 @@
   color: #ef4444;
   font-size: 12px;
   margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.error-message svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
 }
 
 .modal-footer {
@@ -494,7 +536,6 @@
   height: 18px;
 }
 
-/* Responsive */
 @media (max-width: 1024px) {
   .data-table {
     display: block;
@@ -537,4 +578,94 @@
     max-height: 100vh;
     border-radius: 0;
   }
+}
+.vencida {
+  background: #fef2f2 !important;
+  border-left: 3px solid #ef4444;
+}
+
+.task-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-width: 300px;
+}
+
+.task-cell strong {
+  color: #1e293b;
+  font-size: 14px;
+}
+
+.task-cell small {
+  color: #94a3b8;
+  font-size: 12px;
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.assigned-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.user-avatar-sm {
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.badge-priority {
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  font-size: 11px;
+}
+
+.badge-category {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.status-select {
+  padding: 6px 12px;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.status-select:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.date-cell {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #64748b;
+}
+
+.date-cell svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.date-cell.overdue {
+  color: #ef4444;
+  font-weight: 600;
 }
