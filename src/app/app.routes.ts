@@ -1,6 +1,5 @@
 import { Routes } from '@angular/router';
 import { Login } from './components/login/login';
-import { Dashboard } from './components/dashboard/dashboard';
 import { Prospectos } from './components/prospectos/prospectos';
 import { Clientes } from './components/clientes/clientes';
 import { Empleados } from './components/empleados/empleados';
@@ -14,35 +13,29 @@ export const routes: Routes = [
   // Login - sin guard
   { path: 'login', component: Login },
   
-  // Dashboard - CON guard
-  { 
-    path: 'dashboard', 
-    component: Dashboard,
-    canActivate: [authGuard]
-  },
   
-  // Prospectos - CON guard
+  // Prospectos
   { 
     path: 'prospectos', 
     component: Prospectos,
     canActivate: [authGuard]
   },
   
-  // Clientes - CON guard
+  // Clientes
   { 
     path: 'clientes', 
     component: Clientes,
     canActivate: [authGuard]
   },
   
-  // Empleados - CON guard
+  // Empleados
   { 
     path: 'empleados', 
     component: Empleados,
     canActivate: [authGuard]
   },
   
-  // Tareas - CON guard
+  // Tareas
   { 
     path: 'tareas', 
     component: Tareas,
