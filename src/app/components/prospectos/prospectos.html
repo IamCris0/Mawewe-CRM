@@ -1,1 +1,242 @@
-<p>prospectos works!</p>
+<!-- src/app/components/prospectos/prospectos.html -->
+<app-layout>
+  <div class="prospectos">
+    <!-- Header -->
+    <div class="page-header">
+      <div>
+        <h1>Gestión de Prospectos</h1>
+        <p>Administra tus leads y oportunidades de negocio</p>
+      </div>
+      <button class="btn-primary" (click)="abrirModal()">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+        Nuevo Prospecto
+      </button>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon" style="background: #dbeafe; color: #3b82f6;">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+          </svg>
+        </div>
+        <div class="stat-content">
+          <h3>{{ stats.total }}</h3>
+          <p>Total Prospectos</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon" style="background: #fef3c7; color: #f59e0b;">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="8.5" cy="7" r="4"></circle>
+            <polyline points="17 11 19 13 23 9"></polyline>
+          </svg>
+        </div>
+        <div class="stat-content">
+          <h3>{{ stats.nuevos }}</h3>
+          <p>Nuevos</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon" style="background: #ede9fe; color: #8b5cf6;">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+          </svg>
+        </div>
+        <div class="stat-content">
+          <h3>{{ stats.contactados }}</h3>
+          <p>Contactados</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon" style="background: #d1fae5; color: #10b981;">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+            <polyline points="17 6 23 6 23 12"></polyline>
+          </svg>
+        </div>
+        <div class="stat-content">
+          <h3>{{ stats.negociacion }}</h3>
+          <p>En Negociación</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters-section">
+      <div class="search-box">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"></circle>
+          <path d="m21 21-4.35-4.35"></path>
+        </svg>
+        <input 
+          type="text" 
+          placeholder="Buscar por nombre, empresa o email..." 
+          [(ngModel)]="searchTerm"
+          (input)="filtrarProspectos()"
+        >
+      </div>
+
+      <select [(ngModel)]="filtroEstado" (change)="filtrarProspectos()" class="filter-select">
+        <option value="todos">Todos los estados</option>
+        <option value="nuevo">Nuevo</option>
+        <option value="contactado">Contactado</option>
+        <option value="interesado">Interesado</option>
+        <option value="negociacion">En Negociación</option>
+        <option value="perdido">Perdido</option>
+      </select>
+    </div>
+
+    <!-- Table -->
+    <div class="table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Prospecto</th>
+            <th>Empresa</th>
+            <th>Contacto</th>
+            <th>Estado</th>
+            <th>Origen</th>
+            <th>Valor Estimado</th>
+            <th>Fecha Registro</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let prospecto of prospectosFiltrados">
+            <td>
+              <div class="user-cell">
+                <div class="user-avatar">{{ prospecto.nombre.charAt(0) }}</div>
+                <strong>{{ prospecto.nombre }}</strong>
+              </div>
+            </td>
+            <td>{{ prospecto.empresa }}</td>
+            <td>
+              <div class="contact-cell">
+                <span>{{ prospecto.email }}</span>
+                <small>{{ prospecto.telefono }}</small>
+              </div>
+            </td>
+            <td>
+              <span class="badge" [style.background]="getEstadoColor(prospecto.estado) + '20'" [style.color]="getEstadoColor(prospecto.estado)">
+                {{ getEstadoLabel(prospecto.estado) }}
+              </span>
+            </td>
+            <td>{{ prospecto.origen }}</td>
+            <td><strong>${{ prospecto.valor.toLocaleString() }}</strong></td>
+            <td>{{ prospecto.fechaRegistro | date: 'dd/MM/yyyy' }}</td>
+            <td>
+              <div class="action-buttons">
+                <button class="btn-icon" (click)="abrirModal(prospecto)" title="Editar">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                  </svg>
+                </button>
+                <button class="btn-icon danger" (click)="eliminarProspecto(prospecto.id)" title="Eliminar">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="3 6 5 6 21 6"></polyline>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                  </svg>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div *ngIf="prospectosFiltrados.length === 0" class="empty-state">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+        <h3>No se encontraron prospectos</h3>
+        <p>Intenta ajustar los filtros de búsqueda</p>
+      </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal-overlay" *ngIf="showModal" (click)="cerrarModal()">
+      <div class="modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2>{{ isEditing ? 'Editar Prospecto' : 'Nuevo Prospecto' }}</h2>
+          <button class="btn-close" (click)="cerrarModal()">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+
+        <form (ngSubmit)="guardarProspecto()" class="modal-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Nombre Completo *</label>
+              <input type="text" [(ngModel)]="prospectoForm.nombre" name="nombre" required>
+            </div>
+            <div class="form-group">
+              <label>Empresa *</label>
+              <input type="text" [(ngModel)]="prospectoForm.empresa" name="empresa" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Email *</label>
+              <input type="email" [(ngModel)]="prospectoForm.email" name="email" required>
+            </div>
+            <div class="form-group">
+              <label>Teléfono *</label>
+              <input type="tel" [(ngModel)]="prospectoForm.telefono" name="telefono" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Estado</label>
+              <select [(ngModel)]="prospectoForm.estado" name="estado">
+                <option value="nuevo">Nuevo</option>
+                <option value="contactado">Contactado</option>
+                <option value="interesado">Interesado</option>
+                <option value="negociacion">En Negociación</option>
+                <option value="perdido">Perdido</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Origen</label>
+              <input type="text" [(ngModel)]="prospectoForm.origen" name="origen" placeholder="Web, Referido, etc.">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Valor Estimado ($)</label>
+            <input type="number" [(ngModel)]="prospectoForm.valor" name="valor" min="0">
+          </div>
+
+          <div class="form-group">
+            <label>Notas</label>
+            <textarea [(ngModel)]="prospectoForm.notas" name="notas" rows="4" placeholder="Información adicional..."></textarea>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn-secondary" (click)="cerrarModal()">Cancelar</button>
+            <button type="submit" class="btn-primary">
+              {{ isEditing ? 'Actualizar' : 'Guardar' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</app-layout>

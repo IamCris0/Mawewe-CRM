@@ -1,1 +1,262 @@
-<p>clientes works!</p>
+<!-- src/app/components/clientes/clientes.html -->
+<app-layout>
+  <div class="clientes">
+    <!-- Header -->
+    <div class="page-header">
+      <div>
+        <h1>Gestión de Clientes</h1>
+        <p>Administra tu cartera de clientes activos</p>
+      </div>
+      <button class="btn-primary" (click)="abrirModal()">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+        Nuevo Cliente
+      </button>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon" style="background: #dbeafe; color: #3b82f6;">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+          </svg>
+        </div>
+        <div class="stat-content">
+          <h3>{{ stats.total }}</h3>
+          <p>Total Clientes</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon" style="background: #d1fae5; color: #10b981;">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+          </svg>
+        </div>
+        <div class="stat-content">
+          <h3>{{ stats.activos }}</h3>
+          <p>Activos</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon" style="background: #fef3c7; color: #f59e0b;">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+          </svg>
+        </div>
+        <div class="stat-content">
+          <h3>{{ stats.premium }}</h3>
+          <p>Premium</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon" style="background: #dcfce7; color: #16a34a;">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="8.5" cy="7" r="4"></circle>
+            <line x1="20" y1="8" x2="20" y2="14"></line>
+            <line x1="23" y1="11" x2="17" y2="11"></line>
+          </svg>
+        </div>
+        <div class="stat-content">
+          <h3>{{ stats.nuevos }}</h3>
+          <p>Nuevos</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters-section">
+      <div class="search-box">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"></circle>
+          <path d="m21 21-4.35-4.35"></path>
+        </svg>
+        <input 
+          type="text" 
+          placeholder="Buscar por nombre, empresa o email..." 
+          [(ngModel)]="searchTerm"
+          (input)="filtrarClientes()"
+        >
+      </div>
+
+      <select [(ngModel)]="filtroTipo" (change)="filtrarClientes()" class="filter-select">
+        <option value="todos">Todos los tipos</option>
+        <option value="premium">Premium</option>
+        <option value="regular">Regular</option>
+        <option value="nuevo">Nuevo</option>
+      </select>
+
+      <select [(ngModel)]="filtroEstado" (change)="filtrarClientes()" class="filter-select">
+        <option value="todos">Todos los estados</option>
+        <option value="activo">Activo</option>
+        <option value="inactivo">Inactivo</option>
+      </select>
+    </div>
+
+    <!-- Table -->
+    <div class="table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Cliente</th>
+            <th>Empresa</th>
+            <th>Contacto</th>
+            <th>RUC</th>
+            <th>Tipo</th>
+            <th>Estado</th>
+            <th>Total Compras</th>
+            <th>Última Compra</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let cliente of clientesFiltrados">
+            <td>
+              <div class="user-cell">
+                <div class="user-avatar">{{ cliente.nombre.charAt(0) }}</div>
+                <strong>{{ cliente.nombre }}</strong>
+              </div>
+            </td>
+            <td>{{ cliente.empresa }}</td>
+            <td>
+              <div class="contact-cell">
+                <span>{{ cliente.email }}</span>
+                <small>{{ cliente.telefono }}</small>
+              </div>
+            </td>
+            <td>{{ cliente.ruc }}</td>
+            <td>
+              <span class="badge" [style.background]="getTipoColor(cliente.tipo) + '20'" [style.color]="getTipoColor(cliente.tipo)">
+                {{ getTipoLabel(cliente.tipo) }}
+              </span>
+            </td>
+            <td>
+              <span class="badge" [class.badge-success]="cliente.estado === 'activo'" [class.badge-danger]="cliente.estado === 'inactivo'">
+                {{ cliente.estado === 'activo' ? 'Activo' : 'Inactivo' }}
+              </span>
+            </td>
+            <td><strong>${{ cliente.totalCompras.toLocaleString() }}</strong></td>
+            <td>{{ cliente.ultimaCompra | date: 'dd/MM/yyyy' }}</td>
+            <td>
+              <div class="action-buttons">
+                <button class="btn-icon" (click)="abrirModal(cliente)" title="Editar">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                  </svg>
+                </button>
+                <button class="btn-icon danger" (click)="eliminarCliente(cliente.id)" title="Eliminar">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="3 6 5 6 21 6"></polyline>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                  </svg>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div *ngIf="clientesFiltrados.length === 0" class="empty-state">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+          <circle cx="9" cy="7" r="4"></circle>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+        </svg>
+        <h3>No se encontraron clientes</h3>
+        <p>Intenta ajustar los filtros de búsqueda</p>
+      </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal-overlay" *ngIf="showModal" (click)="cerrarModal()">
+      <div class="modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2>{{ isEditing ? 'Editar Cliente' : 'Nuevo Cliente' }}</h2>
+          <button class="btn-close" (click)="cerrarModal()">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+
+        <form (ngSubmit)="guardarCliente()" class="modal-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Nombre Completo *</label>
+              <input type="text" [(ngModel)]="clienteForm.nombre" name="nombre" required>
+            </div>
+            <div class="form-group">
+              <label>Empresa *</label>
+              <input type="text" [(ngModel)]="clienteForm.empresa" name="empresa" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Email *</label>
+              <input type="email" [(ngModel)]="clienteForm.email" name="email" required>
+            </div>
+            <div class="form-group">
+              <label>Teléfono *</label>
+              <input type="tel" [(ngModel)]="clienteForm.telefono" name="telefono" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>RUC/CI *</label>
+              <input type="text" [(ngModel)]="clienteForm.ruc" name="ruc" required>
+            </div>
+            <div class="form-group">
+              <label>Dirección</label>
+              <input type="text" [(ngModel)]="clienteForm.direccion" name="direccion">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Tipo de Cliente</label>
+              <select [(ngModel)]="clienteForm.tipo" name="tipo">
+                <option value="nuevo">Nuevo</option>
+                <option value="regular">Regular</option>
+                <option value="premium">Premium</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Estado</label>
+              <select [(ngModel)]="clienteForm.estado" name="estado">
+                <option value="activo">Activo</option>
+                <option value="inactivo">Inactivo</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Notas</label>
+            <textarea [(ngModel)]="clienteForm.notas" name="notas" rows="4" placeholder="Información adicional del cliente..."></textarea>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn-secondary" (click)="cerrarModal()">Cancelar</button>
+            <button type="submit" class="btn-primary">
+              {{ isEditing ? 'Actualizar' : 'Guardar' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</app-layout>
