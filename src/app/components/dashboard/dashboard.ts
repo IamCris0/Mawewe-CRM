@@ -4,7 +4,7 @@ import { Data } from '../../services/data';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [CommonModule,],
+  imports: [CommonModule],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
 })

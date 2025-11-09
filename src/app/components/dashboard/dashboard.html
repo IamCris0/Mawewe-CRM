@@ -1,67 +1,260 @@
-<!-- Agregar este botón en el header del dashboard, después de la fecha -->
-<div class="dashboard-header">
-  <div>
-    <h1>Dashboard</h1>
-    <p>Bienvenido al panel de control de MAWEWE CRM</p>
-  </div>
-  <div style="display: flex; gap: 12px; align-items: center;">
-    <div class="date-info">
-      {{ 'now' | date: 'EEEE, d MMMM yyyy' }}
-    </div>
-    
-    <!-- Menú de exportación -->
-    <div class="export-menu-container">
-      <button class="btn-export" (click)="toggleExportMenu()">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-          <polyline points="7 10 12 15 17 10"></polyline>
-          <line x1="12" y1="15" x2="12" y2="3"></line>
-        </svg>
-        Datos
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <polyline points="6 9 12 15 18 9"></polyline>
-        </svg>
-      </button>
-      
-      @if (showExportMenu()) {
-        <div class="export-dropdown">
-          <button class="export-option" (click)="exportToJSON()">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+<div class="main-content">
+  <div class="container">
+    <!-- Header -->
+    <div class="dashboard-header">
+      <div>
+        <h1>Dashboard</h1>
+        <p>Bienvenido al panel de control de MAWEWE CRM</p>
+      </div>
+      <div style="display: flex; gap: 12px; align-items: center;">
+        <div class="date-info">
+          {{ 'now' | date: 'EEEE, d MMMM yyyy' }}
+        </div>
+        
+        <!-- Menú de exportación -->
+        <div class="export-menu-container">
+          <button class="btn-export" (click)="toggleExportMenu()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
               <polyline points="7 10 12 15 17 10"></polyline>
               <line x1="12" y1="15" x2="12" y2="3"></line>
             </svg>
-            Exportar JSON
-          </button>
-          
-          <button class="export-option" (click)="exportToCSV()">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-              <polyline points="14 2 14 8 20 8"></polyline>
+            Datos
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="6 9 12 15 18 9"></polyline>
             </svg>
-            Exportar CSV
           </button>
           
-          <button class="export-option" (click)="importData()">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-              <polyline points="17 8 12 3 7 8"></polyline>
-              <line x1="12" y1="3" x2="12" y2="15"></line>
-            </svg>
-            Importar JSON
-          </button>
-          
-          <div class="dropdown-divider"></div>
-          
-          <button class="export-option danger" (click)="resetData()">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="1 4 1 10 7 10"></polyline>
-              <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
-            </svg>
-            Resetear Datos
-          </button>
+          @if (showExportMenu()) {
+            <div class="export-dropdown">
+              <button class="export-option" (click)="exportToJSON()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="7 10 12 15 17 10"></polyline>
+                  <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                Exportar JSON
+              </button>
+              
+              <button class="export-option" (click)="exportToCSV()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                </svg>
+                Exportar CSV
+              </button>
+              
+              <button class="export-option" (click)="importData()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="17 8 12 3 7 8"></polyline>
+                  <line x1="12" y1="3" x2="12" y2="15"></line>
+                </svg>
+                Importar JSON
+              </button>
+              
+              <div class="dropdown-divider"></div>
+              
+              <button class="export-option danger" (click)="resetData()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="1 4 1 10 7 10"></polyline>
+                  <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+                </svg>
+                Resetear Datos
+              </button>
+            </div>
+          }
         </div>
-      }
+      </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+      <div class="stat-card stat-primary">
+        <div class="stat-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+          </svg>
+        </div>
+        <div class="stat-details">
+          <h3>{{ stats.totalProspectos }}</h3>
+          <p>Total Prospectos</p>
+          <span class="stat-badge badge-blue">+{{ stats.prospectosNuevos }} nuevos</span>
+        </div>
+      </div>
+
+      <div class="stat-card stat-success">
+        <div class="stat-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="8.5" cy="7" r="4"></circle>
+            <polyline points="17 11 19 13 23 9"></polyline>
+          </svg>
+        </div>
+        <div class="stat-details">
+          <h3>{{ stats.totalClientes }}</h3>
+          <p>Clientes Activos</p>
+          <span class="stat-badge badge-green">{{ stats.tasaConversion }}% conversión</span>
+        </div>
+      </div>
+
+      <div class="stat-card stat-warning">
+        <div class="stat-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 20h9"></path>
+            <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+          </svg>
+        </div>
+        <div class="stat-details">
+          <h3>{{ stats.tareasPendientes }}</h3>
+          <p>Tareas Pendientes</p>
+          <span class="stat-badge badge-orange">Requieren atención</span>
+        </div>
+      </div>
+
+      <div class="stat-card stat-info">
+        <div class="stat-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+          </svg>
+        </div>
+        <div class="stat-details">
+          <h3>{{ stats.totalEmpleados }}</h3>
+          <p>Empleados Activos</p>
+          <span class="stat-badge badge-purple">Equipo completo</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="charts-row">
+      <!-- Prospectos por Estado -->
+      <div class="chart-container">
+        <h3 class="chart-title">Distribución de Prospectos</h3>
+        <div class="chart-bars">
+          <div class="chart-bar-item">
+            <span class="chart-label">Nuevos</span>
+            <div class="chart-bar-bg">
+              <div class="chart-bar-fill" [style.width.%]="(getProspectosDistribution().nuevo / stats.totalProspectos * 100)">
+                {{ getProspectosDistribution().nuevo }}
+              </div>
+            </div>
+          </div>
+          <div class="chart-bar-item">
+            <span class="chart-label">Contactados</span>
+            <div class="chart-bar-bg">
+              <div class="chart-bar-fill" [style.width.%]="(getProspectosDistribution().contactado / stats.totalProspectos * 100)">
+                {{ getProspectosDistribution().contactado }}
+              </div>
+            </div>
+          </div>
+          <div class="chart-bar-item">
+            <span class="chart-label">Negociación</span>
+            <div class="chart-bar-bg">
+              <div class="chart-bar-fill" [style.width.%]="(getProspectosDistribution().negociacion / stats.totalProspectos * 100)">
+                {{ getProspectosDistribution().negociacion }}
+              </div>
+            </div>
+          </div>
+          <div class="chart-bar-item">
+            <span class="chart-label">Ganados</span>
+            <div class="chart-bar-bg">
+              <div class="chart-bar-fill" [style.width.%]="(getProspectosDistribution().ganado / stats.totalProspectos * 100)">
+                {{ getProspectosDistribution().ganado }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tareas por Estado -->
+      <div class="chart-container">
+        <h3 class="chart-title">Estado de Tareas</h3>
+        <div class="chart-bars">
+          <div class="chart-bar-item">
+            <span class="chart-label">Pendientes</span>
+            <div class="chart-bar-bg">
+              <div class="chart-bar-fill" [style.width.%]="(getTareasDistribution().pendiente / (getTareasDistribution().pendiente + getTareasDistribution().enProgreso + getTareasDistribution().completada) * 100)">
+                {{ getTareasDistribution().pendiente }}
+              </div>
+            </div>
+          </div>
+          <div class="chart-bar-item">
+            <span class="chart-label">En Progreso</span>
+            <div class="chart-bar-bg">
+              <div class="chart-bar-fill" [style.width.%]="(getTareasDistribution().enProgreso / (getTareasDistribution().pendiente + getTareasDistribution().enProgreso + getTareasDistribution().completada) * 100)">
+                {{ getTareasDistribution().enProgreso }}
+              </div>
+            </div>
+          </div>
+          <div class="chart-bar-item">
+            <span class="chart-label">Completadas</span>
+            <div class="chart-bar-bg">
+              <div class="chart-bar-fill" [style.width.%]="(getTareasDistribution().completada / (getTareasDistribution().pendiente + getTareasDistribution().enProgreso + getTareasDistribution().completada) * 100)">
+                {{ getTareasDistribution().completada }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="activity-section">
+      <div class="section-header">
+        <h3>Actividad Reciente</h3>
+      </div>
+      
+      <div class="activity-grid">
+        <!-- Prospectos Recientes -->
+        <div class="activity-card">
+          <h4>Últimos Prospectos</h4>
+          <div class="activity-list">
+            @for (prospecto of prospectos.slice(0, 5); track prospecto.id) {
+              <div class="activity-item">
+                <div class="activity-avatar">{{ prospecto.nombre.charAt(0) }}</div>
+                <div class="activity-info">
+                  <p class="activity-name">{{ prospecto.nombre }}</p>
+                  <p class="activity-detail">{{ prospecto.empresa }}</p>
+                </div>
+                <span class="badge" [ngClass]="getEstadoClass(prospecto.estado)">
+                  {{ prospecto.estado }}
+                </span>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Tareas Pendientes -->
+        <div class="activity-card">
+          <h4>Tareas Urgentes</h4>
+          <div class="activity-list">
+            @for (tarea of tareas.slice(0, 5); track tarea.id) {
+              <div class="activity-item">
+                <div class="activity-icon" [ngClass]="getPrioridadClass(tarea.prioridad)">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="9 11 12 14 22 4"></polyline>
+                    <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+                  </svg>
+                </div>
+                <div class="activity-info">
+                  <p class="activity-name">{{ tarea.titulo }}</p>
+                  <p class="activity-detail">{{ tarea.asignadoA }}</p>
+                </div>
+                <span class="badge" [ngClass]="getEstadoClass(tarea.estado)">
+                  {{ tarea.estado }}
+                </span>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
