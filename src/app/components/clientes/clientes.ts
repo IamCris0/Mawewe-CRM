@@ -1,4 +1,4 @@
-// src/app/components/clientes/clientes.ts
+// src/app/components/clientes/clientes.ts - VERSIÓN MEJORADA
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -39,6 +39,7 @@ export class Clientes implements OnInit {
   isEditing: boolean = false;
   
   clienteForm: Cliente = this.getEmptyCliente();
+  formErrors: { [key: string]: string } = {};
 
   stats = {
     total: 0,
@@ -53,70 +54,70 @@ export class Clientes implements OnInit {
   }
 
   cargarClientes() {
-    this.clientes = [
-      {
-        id: 1,
-        nombre: 'María Rodríguez',
-        empresa: 'Tech Innovations EC',
-        email: 'maria@techinnovations.com',
-        telefono: '0999888777',
-        direccion: 'Av. Principal 123, Quito',
-        ruc: '1792345678001',
-        tipo: 'premium',
-        estado: 'activo',
-        fechaRegistro: new Date('2023-06-15'),
-        totalCompras: 45000,
-        ultimaCompra: new Date('2024-11-01'),
-        notas: 'Cliente VIP - Descuento especial 15%'
-      },
-      {
-        id: 2,
-        nombre: 'Carlos Jiménez',
-        empresa: 'Comercial Sur S.A.',
-        email: 'carlos@comercialsur.com',
-        telefono: '0998777666',
-        direccion: 'Calle Comercio 456, Guayaquil',
-        ruc: '0992345678001',
-        tipo: 'regular',
-        estado: 'activo',
-        fechaRegistro: new Date('2023-09-20'),
-        totalCompras: 28000,
-        ultimaCompra: new Date('2024-10-28'),
-        notas: 'Pago puntual - Excelente cliente'
-      },
-      {
-        id: 3,
-        nombre: 'Ana Morales',
-        empresa: 'Distribuidora Norte',
-        email: 'ana@distribuidoranorte.com',
-        telefono: '0997666555',
-        direccion: 'Av. 6 de Diciembre, Quito',
-        ruc: '1792555666001',
-        tipo: 'nuevo',
-        estado: 'activo',
-        fechaRegistro: new Date('2024-10-05'),
-        totalCompras: 5500,
-        ultimaCompra: new Date('2024-11-05'),
-        notas: 'Cliente nuevo - Potencial de crecimiento'
-      },
-      {
-        id: 4,
-        nombre: 'Pedro Vásquez',
-        empresa: 'Importadora Pacífico',
-        email: 'pedro@importadorapacifico.com',
-        telefono: '0996555444',
-        direccion: 'Malecón 789, Guayaquil',
-        ruc: '0992888999001',
-        tipo: 'premium',
-        estado: 'activo',
-        fechaRegistro: new Date('2022-03-10'),
-        totalCompras: 78000,
-        ultimaCompra: new Date('2024-10-30'),
-        notas: 'Mejor cliente 2023 - Programa de lealtad'
-      }
-    ];
+    const stored = localStorage.getItem('clientes');
+    if (stored) {
+      this.clientes = JSON.parse(stored).map((c: any) => ({
+        ...c,
+        fechaRegistro: new Date(c.fechaRegistro),
+        ultimaCompra: new Date(c.ultimaCompra)
+      }));
+    } else {
+      // Datos de ejemplo iniciales
+      this.clientes = [
+        {
+          id: 1,
+          nombre: 'María Rodríguez',
+          empresa: 'Tech Innovations EC',
+          email: 'maria@techinnovations.com',
+          telefono: '0999888777',
+          direccion: 'Av. Principal 123, Quito',
+          ruc: '1792345678001',
+          tipo: 'premium',
+          estado: 'activo',
+          fechaRegistro: new Date('2023-06-15'),
+          totalCompras: 45000,
+          ultimaCompra: new Date('2024-11-01'),
+          notas: 'Cliente VIP - Descuento especial 15%'
+        },
+        {
+          id: 2,
+          nombre: 'Carlos Jiménez',
+          empresa: 'Comercial Sur S.A.',
+          email: 'carlos@comercialsur.com',
+          telefono: '0998777666',
+          direccion: 'Calle Comercio 456, Guayaquil',
+          ruc: '0992345678001',
+          tipo: 'regular',
+          estado: 'activo',
+          fechaRegistro: new Date('2023-09-20'),
+          totalCompras: 28000,
+          ultimaCompra: new Date('2024-10-28'),
+          notas: 'Pago puntual - Excelente cliente'
+        },
+        {
+          id: 3,
+          nombre: 'Ana Morales',
+          empresa: 'Distribuidora Norte',
+          email: 'ana@distribuidoranorte.com',
+          telefono: '0997666555',
+          direccion: 'Av. 6 de Diciembre, Quito',
+          ruc: '1792555666001',
+          tipo: 'nuevo',
+          estado: 'activo',
+          fechaRegistro: new Date('2024-10-05'),
+          totalCompras: 5500,
+          ultimaCompra: new Date('2024-11-05'),
+          notas: 'Cliente nuevo - Potencial de crecimiento'
+        }
+      ];
+      this.guardarEnStorage();
+    }
     
     this.clientesFiltrados = [...this.clientes];
+  }
+
+  guardarEnStorage() {
+    localStorage.setItem('clientes', JSON.stringify(this.clientes));
   }
 
   calcularEstadisticas() {
@@ -157,8 +158,67 @@ export class Clientes implements OnInit {
     };
   }
 
+  validarFormulario(): boolean {
+    this.formErrors = {};
+    let valido = true;
+
+    // Validar nombre
+    if (!this.clienteForm.nombre.trim()) {
+      this.formErrors['nombre'] = 'El nombre es requerido';
+      valido = false;
+    } else if (this.clienteForm.nombre.length < 3) {
+      this.formErrors['nombre'] = 'El nombre debe tener al menos 3 caracteres';
+      valido = false;
+    }
+
+    // Validar empresa
+    if (!this.clienteForm.empresa.trim()) {
+      this.formErrors['empresa'] = 'La empresa es requerida';
+      valido = false;
+    }
+
+    // Validar email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!this.clienteForm.email.trim()) {
+      this.formErrors['email'] = 'El email es requerido';
+      valido = false;
+    } else if (!emailRegex.test(this.clienteForm.email)) {
+      this.formErrors['email'] = 'Email inválido';
+      valido = false;
+    }
+
+    // Validar teléfono
+    const telefonoRegex = /^[0-9]{10}$/;
+    if (!this.clienteForm.telefono.trim()) {
+      this.formErrors['telefono'] = 'El teléfono es requerido';
+      valido = false;
+    } else if (!telefonoRegex.test(this.clienteForm.telefono.replace(/\s/g, ''))) {
+      this.formErrors['telefono'] = 'Teléfono debe tener 10 dígitos';
+      valido = false;
+    }
+
+    // Validar RUC
+    const rucRegex = /^[0-9]{13}$/;
+    if (!this.clienteForm.ruc.trim()) {
+      this.formErrors['ruc'] = 'El RUC es requerido';
+      valido = false;
+    } else if (!rucRegex.test(this.clienteForm.ruc)) {
+      this.formErrors['ruc'] = 'RUC debe tener 13 dígitos';
+      valido = false;
+    }
+
+    // Validar total compras
+    if (this.clienteForm.totalCompras < 0) {
+      this.formErrors['totalCompras'] = 'El total de compras no puede ser negativo';
+      valido = false;
+    }
+
+    return valido;
+  }
+
   abrirModal(cliente?: Cliente) {
     this.showModal = true;
+    this.formErrors = {};
     if (cliente) {
       this.isEditing = true;
       this.clienteForm = { ...cliente };
@@ -171,9 +231,14 @@ export class Clientes implements OnInit {
   cerrarModal() {
     this.showModal = false;
     this.clienteForm = this.getEmptyCliente();
+    this.formErrors = {};
   }
 
   guardarCliente() {
+    if (!this.validarFormulario()) {
+      return;
+    }
+
     if (this.isEditing) {
       const index = this.clientes.findIndex(c => c.id === this.clienteForm.id);
       if (index !== -1) {
@@ -181,17 +246,31 @@ export class Clientes implements OnInit {
       }
     } else {
       this.clienteForm.id = Math.max(...this.clientes.map(c => c.id), 0) + 1;
-      this.clientes.push({ ...this.clienteForm });
+      this.clienteForm.fechaRegistro = new Date();
+      this.clienteForm.ultimaCompra = new Date();
+      this.clientes.unshift({ ...this.clienteForm });
     }
     
+    this.guardarEnStorage();
     this.calcularEstadisticas();
     this.filtrarClientes();
     this.cerrarModal();
   }
 
   eliminarCliente(id: number) {
-    if (confirm('¿Estás seguro de eliminar este cliente?')) {
+    if (confirm('¿Estás seguro de eliminar este cliente? Esta acción no se puede deshacer.')) {
       this.clientes = this.clientes.filter(c => c.id !== id);
+      this.guardarEnStorage();
+      this.calcularEstadisticas();
+      this.filtrarClientes();
+    }
+  }
+
+  cambiarEstado(cliente: Cliente, nuevoEstado: string) {
+    const index = this.clientes.findIndex(c => c.id === cliente.id);
+    if (index !== -1) {
+      this.clientes[index].estado = nuevoEstado as any;
+      this.guardarEnStorage();
       this.calcularEstadisticas();
       this.filtrarClientes();
     }
@@ -213,5 +292,53 @@ export class Clientes implements OnInit {
       'nuevo': 'Nuevo'
     };
     return labels[tipo] || tipo;
+  }
+
+  exportarDatos() {
+    const dataStr = JSON.stringify(this.clientes, null, 2);
+    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(dataBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `clientes_${new Date().toISOString().split('T')[0]}.json`;
+    link.click();
+    URL.revokeObjectURL(url);
+  }
+
+  ordenarPor(campo: keyof Cliente) {
+    this.clientesFiltrados.sort((a, b) => {
+      if (a[campo] < b[campo]) return -1;
+      if (a[campo] > b[campo]) return 1;
+      return 0;
+    });
+  }
+
+  generarReporte() {
+    const ventasTotales = this.clientes.reduce((sum, c) => sum + c.totalCompras, 0);
+    const promedioCompras = ventasTotales / this.clientes.length;
+    
+    const reporte = `
+=== REPORTE DE CLIENTES ===
+Fecha: ${new Date().toLocaleDateString()}
+
+📊 Estadísticas Generales:
+- Total Clientes: ${this.stats.total}
+- Clientes Activos: ${this.stats.activos}
+- Clientes Premium: ${this.stats.premium}
+- Clientes Nuevos: ${this.stats.nuevos}
+
+💰 Información Financiera:
+- Ventas Totales: $${ventasTotales.toLocaleString()}
+- Promedio por Cliente: $${promedioCompras.toFixed(2)}
+
+🏆 Top 3 Clientes:
+${this.clientes
+  .sort((a, b) => b.totalCompras - a.totalCompras)
+  .slice(0, 3)
+  .map((c, i) => `${i + 1}. ${c.nombre} - $${c.totalCompras.toLocaleString()}`)
+  .join('\n')}
+    `;
+    
+    alert(reporte);
   }
 }
