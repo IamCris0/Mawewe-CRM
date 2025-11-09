@@ -6,13 +6,31 @@
         <h1>Gestión de Tareas</h1>
         <p>Organiza y da seguimiento a tus actividades</p>
       </div>
-      <button class="btn-primary" (click)="abrirModal()">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="12" y1="5" x2="12" y2="19"></line>
-          <line x1="5" y1="12" x2="19" y2="12"></line>
-        </svg>
-        Nueva Tarea
-      </button>
+      <div class="header-actions">
+        <button class="btn-secondary" (click)="generarReporte()" title="Generar reporte">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+          </svg>
+          Reporte
+        </button>
+        <button class="btn-secondary" (click)="exportarDatos()">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          Exportar
+        </button>
+        <button class="btn-primary" (click)="abrirModal()">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          Nueva Tarea
+        </button>
+      </div>
     </div>
 
     <div class="stats-grid">
@@ -102,7 +120,12 @@
       <table class="data-table">
         <thead>
           <tr>
-            <th>Tarea</th>
+            <th (click)="ordenarPor('titulo')" style="cursor: pointer;">
+              Tarea
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 14px; height: 14px; display: inline; margin-left: 4px;">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </th>
             <th>Asignado a</th>
             <th>Prioridad</th>
             <th>Estado</th>
@@ -113,7 +136,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let tarea of tareasFiltradas" [class.vencida]="estaVencida(tarea.fechaVencimiento)">
+          <tr *ngFor="let tarea of tareasFiltradas" [class.vencida]="estaVencida(tarea.fechaVencimiento) && tarea.estado === 'pendiente'">
             <td>
               <div class="task-cell">
                 <strong>{{ tarea.titulo }}</strong>
@@ -122,7 +145,7 @@
             </td>
             <td>
               <div class="assigned-cell">
-                <div class="user-avatar-sm">{{ tarea.asignadoA.charAt(0) }}</div>
+                <div class="user-avatar-sm">{{ tarea.asignadoA.charAt(0).toUpperCase() }}</div>
                 <span>{{ tarea.asignadoA }}</span>
               </div>
             </td>
@@ -136,6 +159,7 @@
                 class="status-select" 
                 [(ngModel)]="tarea.estado" 
                 (change)="cambiarEstado(tarea, tarea.estado)"
+                [style.background]="getEstadoColor(tarea.estado) + '20'"
                 [style.color]="getEstadoColor(tarea.estado)"
               >
                 <option value="pendiente">Pendiente</option>
@@ -148,7 +172,7 @@
               <span class="badge badge-category">{{ tarea.categoria }}</span>
             </td>
             <td>
-              <div class="date-cell" [class.overdue]="estaVencida(tarea.fechaVencimiento)">
+              <div class="date-cell" [class.overdue]="estaVencida(tarea.fechaVencimiento) && tarea.estado === 'pendiente'">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
                   <line x1="16" y1="2" x2="16" y2="6"></line>
@@ -158,9 +182,7 @@
                 {{ tarea.fechaVencimiento | date: 'dd/MM/yyyy' }}
               </div>
             </td>
-            <td>
-              <small>{{ tarea.relacionadoCon }}</small>
-            </td>
+            <td><small>{{ tarea.relacionadoCon }}</small></td>
             <td>
               <div class="action-buttons">
                 <button class="btn-icon" (click)="abrirModal(tarea)" title="Editar">
@@ -187,10 +209,11 @@
           <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
         </svg>
         <h3>No se encontraron tareas</h3>
-        <p>Intenta ajustar los filtros de búsqueda</p>
+        <p>{{ searchTerm ? 'Intenta ajustar los filtros de búsqueda' : 'Comienza agregando tu primera tarea' }}</p>
       </div>
     </div>
 
+    <!-- Modal -->
     <div class="modal-overlay" *ngIf="showModal" (click)="cerrarModal()">
       <div class="modal" (click)="$event.stopPropagation()">
         <div class="modal-header">
@@ -206,21 +229,62 @@
         <form (ngSubmit)="guardarTarea()" class="modal-body">
           <div class="form-group">
             <label>Título *</label>
-            <input type="text" [(ngModel)]="tareaForm.titulo" name="titulo" required>
+            <input 
+              type="text" 
+              [(ngModel)]="tareaForm.titulo" 
+              name="titulo" 
+              [class.error]="formErrors['titulo']"
+              required
+            >
+            <span class="error-message" *ngIf="formErrors['titulo']">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              </svg>
+              {{ formErrors['titulo'] }}
+            </span>
           </div>
 
           <div class="form-group">
             <label>Descripción *</label>
-            <textarea [(ngModel)]="tareaForm.descripcion" name="descripcion" rows="3" required></textarea>
+            <textarea 
+              [(ngModel)]="tareaForm.descripcion" 
+              name="descripcion" 
+              rows="3" 
+              [class.error]="formErrors['descripcion']"
+              required
+            ></textarea>
+            <span class="error-message" *ngIf="formErrors['descripcion']">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              </svg>
+              {{ formErrors['descripcion'] }}
+            </span>
           </div>
 
           <div class="form-row">
             <div class="form-group">
               <label>Asignado a *</label>
-              <select [(ngModel)]="tareaForm.asignadoA" name="asignadoA" required>
+              <select 
+                [(ngModel)]="tareaForm.asignadoA" 
+                name="asignadoA" 
+                [class.error]="formErrors['asignadoA']"
+                required
+              >
                 <option value="">Seleccionar...</option>
                 <option *ngFor="let empleado of empleados" [value]="empleado">{{ empleado }}</option>
               </select>
+              <span class="error-message" *ngIf="formErrors['asignadoA']">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="8" x2="12" y2="12"></line>
+                  <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+                {{ formErrors['asignadoA'] }}
+              </span>
             </div>
             <div class="form-group">
               <label>Categoría</label>
@@ -251,23 +315,50 @@
           </div>
 
           <div class="form-group">
-            <label>Fecha de Vencimiento</label>
-            <input type="date" [(ngModel)]="tareaForm.fechaVencimiento" name="fechaVencimiento">
+            <label>Fecha de Vencimiento *</label>
+            <input 
+              type="date" 
+              [(ngModel)]="tareaForm.fechaVencimiento" 
+              name="fechaVencimiento"
+              [class.error]="formErrors['fechaVencimiento']"
+              required
+            >
+            <span class="error-message" *ngIf="formErrors['fechaVencimiento']">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              </svg>
+              {{ formErrors['fechaVencimiento'] }}
+            </span>
           </div>
 
           <div class="form-group">
             <label>Relacionado con</label>
-            <input type="text" [(ngModel)]="tareaForm.relacionadoCon" name="relacionadoCon" placeholder="Cliente, Prospecto, Proyecto, etc.">
+            <input 
+              type="text" 
+              [(ngModel)]="tareaForm.relacionadoCon" 
+              name="relacionadoCon" 
+              placeholder="Cliente, Prospecto, Proyecto, etc."
+            >
           </div>
 
           <div class="form-group">
             <label>Notas</label>
-            <textarea [(ngModel)]="tareaForm.notas" name="notas" rows="3" placeholder="Información adicional..."></textarea>
+            <textarea 
+              [(ngModel)]="tareaForm.notas" 
+              name="notas" 
+              rows="3" 
+              placeholder="Información adicional..."
+            ></textarea>
           </div>
 
           <div class="modal-footer">
-            <button type="button" class="btn-secondary" (click)="cerrarModal()">Cancelar</button>
+            <button type="button" class="btn-secondary-modal" (click)="cerrarModal()">Cancelar</button>
             <button type="submit" class="btn-primary">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
               {{ isEditing ? 'Actualizar' : 'Guardar' }}
             </button>
           </div>

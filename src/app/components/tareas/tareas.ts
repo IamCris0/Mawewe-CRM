@@ -1,4 +1,3 @@
-// src/app/components/tareas/tareas.ts
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -37,6 +36,7 @@ export class Tareas implements OnInit {
   isEditing: boolean = false;
   
   tareaForm: Tarea = this.getEmptyTarea();
+  formErrors: { [key: string]: string } = {};
 
   stats = {
     total: 0,
@@ -45,7 +45,7 @@ export class Tareas implements OnInit {
     completadas: 0
   };
 
-  categorias = ['Ventas', 'Seguimiento', 'Reunión', 'Documentación', 'Llamada', 'Email', 'Otro'];
+  categorias = ['Ventas', 'Seguimiento', 'Reunión', 'Documentación', 'Llamada', 'Email', 'Soporte', 'Administrativo'];
   empleados = ['Carlos Mendoza', 'Ana Torres', 'Luis Ramírez', 'María González', 'Pedro Vásquez'];
 
   ngOnInit() {
@@ -54,75 +54,63 @@ export class Tareas implements OnInit {
   }
 
   cargarTareas() {
-    this.tareas = [
-      {
-        id: 1,
-        titulo: 'Llamar a prospecto Juan Pérez',
-        descripcion: 'Seguimiento de propuesta comercial enviada la semana pasada',
-        asignadoA: 'Carlos Mendoza',
-        prioridad: 'alta',
-        estado: 'pendiente',
-        fechaCreacion: new Date('2024-11-07'),
-        fechaVencimiento: new Date('2024-11-09'),
-        categoria: 'Llamada',
-        relacionadoCon: 'Prospecto: Juan Pérez',
-        notas: 'Interesado en paquete premium'
-      },
-      {
-        id: 2,
-        titulo: 'Enviar cotización a Comercial López',
-        descripcion: 'Preparar y enviar cotización detallada para servicios solicitados',
-        asignadoA: 'Ana Torres',
-        prioridad: 'alta',
-        estado: 'en_progreso',
-        fechaCreacion: new Date('2024-11-08'),
-        fechaVencimiento: new Date('2024-11-10'),
-        categoria: 'Ventas',
-        relacionadoCon: 'Cliente: Comercial López',
-        notas: 'Incluir descuento del 10%'
-      },
-      {
-        id: 3,
-        titulo: 'Reunión de equipo semanal',
-        descripcion: 'Revisión de objetivos y metas de la semana',
-        asignadoA: 'María González',
-        prioridad: 'media',
-        estado: 'pendiente',
-        fechaCreacion: new Date('2024-11-05'),
-        fechaVencimiento: new Date('2024-11-09'),
-        categoria: 'Reunión',
-        relacionadoCon: 'Equipo de ventas',
-        notas: 'Preparar reporte de resultados'
-      },
-      {
-        id: 4,
-        titulo: 'Actualizar base de datos de clientes',
-        descripcion: 'Verificar y actualizar información de contacto de clientes',
-        asignadoA: 'Luis Ramírez',
-        prioridad: 'baja',
-        estado: 'completada',
-        fechaCreacion: new Date('2024-11-01'),
-        fechaVencimiento: new Date('2024-11-05'),
-        categoria: 'Documentación',
-        relacionadoCon: 'Sistema CRM',
-        notas: 'Completado exitosamente'
-      },
-      {
-        id: 5,
-        titulo: 'Seguimiento cliente Distribuidora XYZ',
-        descripcion: 'Verificar satisfacción con última compra',
-        asignadoA: 'Pedro Vásquez',
-        prioridad: 'media',
-        estado: 'en_progreso',
-        fechaCreacion: new Date('2024-11-08'),
-        fechaVencimiento: new Date('2024-11-11'),
-        categoria: 'Seguimiento',
-        relacionadoCon: 'Cliente: Distribuidora XYZ',
-        notas: 'Cliente solicita capacitación'
-      }
-    ];
+    const stored = localStorage.getItem('tareas');
+    if (stored) {
+      this.tareas = JSON.parse(stored).map((t: any) => ({
+        ...t,
+        fechaCreacion: new Date(t.fechaCreacion),
+        fechaVencimiento: new Date(t.fechaVencimiento)
+      }));
+    } else {
+      this.tareas = [
+        {
+          id: 1,
+          titulo: 'Llamar a prospecto Juan Pérez',
+          descripcion: 'Seguimiento de propuesta comercial enviada la semana pasada',
+          asignadoA: 'Carlos Mendoza',
+          prioridad: 'alta',
+          estado: 'pendiente',
+          fechaCreacion: new Date('2024-11-07'),
+          fechaVencimiento: new Date('2024-11-09'),
+          categoria: 'Llamada',
+          relacionadoCon: 'Prospecto: Juan Pérez',
+          notas: 'Interesado en paquete premium'
+        },
+        {
+          id: 2,
+          titulo: 'Enviar cotización a Comercial López',
+          descripcion: 'Preparar y enviar cotización detallada para servicios solicitados',
+          asignadoA: 'Ana Torres',
+          prioridad: 'alta',
+          estado: 'en_progreso',
+          fechaCreacion: new Date('2024-11-08'),
+          fechaVencimiento: new Date('2024-11-10'),
+          categoria: 'Ventas',
+          relacionadoCon: 'Cliente: Comercial López',
+          notas: 'Incluir descuento del 10%'
+        },
+        {
+          id: 3,
+          titulo: 'Reunión de equipo semanal',
+          descripcion: 'Revisión de objetivos y metas de la semana',
+          asignadoA: 'María González',
+          prioridad: 'media',
+          estado: 'pendiente',
+          fechaCreacion: new Date('2024-11-05'),
+          fechaVencimiento: new Date('2024-11-09'),
+          categoria: 'Reunión',
+          relacionadoCon: 'Equipo de ventas',
+          notas: 'Preparar reporte de resultados'
+        }
+      ];
+      this.guardarEnStorage();
+    }
     
     this.tareasFiltradas = [...this.tareas];
+  }
+
+  guardarEnStorage() {
+    localStorage.setItem('tareas', JSON.stringify(this.tareas));
   }
 
   calcularEstadisticas() {
@@ -161,8 +149,41 @@ export class Tareas implements OnInit {
     };
   }
 
+  validarFormulario(): boolean {
+    this.formErrors = {};
+    let valido = true;
+
+    if (!this.tareaForm.titulo.trim()) {
+      this.formErrors['titulo'] = 'El título es requerido';
+      valido = false;
+    }
+
+    if (!this.tareaForm.descripcion.trim()) {
+      this.formErrors['descripcion'] = 'La descripción es requerida';
+      valido = false;
+    }
+
+    if (!this.tareaForm.asignadoA) {
+      this.formErrors['asignadoA'] = 'Debe asignar la tarea a alguien';
+      valido = false;
+    }
+
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+    const fechaVenc = new Date(this.tareaForm.fechaVencimiento);
+    fechaVenc.setHours(0, 0, 0, 0);
+
+    if (fechaVenc < hoy && !this.isEditing) {
+      this.formErrors['fechaVencimiento'] = 'La fecha de vencimiento no puede ser anterior a hoy';
+      valido = false;
+    }
+
+    return valido;
+  }
+
   abrirModal(tarea?: Tarea) {
     this.showModal = true;
+    this.formErrors = {};
     if (tarea) {
       this.isEditing = true;
       this.tareaForm = { ...tarea };
@@ -175,9 +196,14 @@ export class Tareas implements OnInit {
   cerrarModal() {
     this.showModal = false;
     this.tareaForm = this.getEmptyTarea();
+    this.formErrors = {};
   }
 
   guardarTarea() {
+    if (!this.validarFormulario()) {
+      return;
+    }
+
     if (this.isEditing) {
       const index = this.tareas.findIndex(t => t.id === this.tareaForm.id);
       if (index !== -1) {
@@ -185,9 +211,11 @@ export class Tareas implements OnInit {
       }
     } else {
       this.tareaForm.id = Math.max(...this.tareas.map(t => t.id), 0) + 1;
-      this.tareas.push({ ...this.tareaForm });
+      this.tareaForm.fechaCreacion = new Date();
+      this.tareas.unshift({ ...this.tareaForm });
     }
     
+    this.guardarEnStorage();
     this.calcularEstadisticas();
     this.filtrarTareas();
     this.cerrarModal();
@@ -196,6 +224,7 @@ export class Tareas implements OnInit {
   eliminarTarea(id: number) {
     if (confirm('¿Estás seguro de eliminar esta tarea?')) {
       this.tareas = this.tareas.filter(t => t.id !== id);
+      this.guardarEnStorage();
       this.calcularEstadisticas();
       this.filtrarTareas();
     }
@@ -205,6 +234,7 @@ export class Tareas implements OnInit {
     const index = this.tareas.findIndex(t => t.id === tarea.id);
     if (index !== -1) {
       this.tareas[index].estado = nuevoEstado as any;
+      this.guardarEnStorage();
       this.calcularEstadisticas();
       this.filtrarTareas();
     }
@@ -229,17 +259,86 @@ export class Tareas implements OnInit {
     return colores[estado] || '#6b7280';
   }
 
-  getEstadoLabel(estado: string): string {
-    const labels: any = {
-      'pendiente': 'Pendiente',
-      'en_progreso': 'En Progreso',
-      'completada': 'Completada',
-      'cancelada': 'Cancelada'
-    };
-    return labels[estado] || estado;
+  estaVencida(fecha: Date): boolean {
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+    const fechaVenc = new Date(fecha);
+    fechaVenc.setHours(0, 0, 0, 0);
+    return fechaVenc < hoy;
   }
 
-  estaVencida(fecha: Date): boolean {
-    return new Date(fecha) < new Date() && this.tareaForm.estado !== 'completada';
+  exportarDatos() {
+    const dataStr = JSON.stringify(this.tareas, null, 2);
+    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(dataBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `tareas_${new Date().toISOString().split('T')[0]}.json`;
+    link.click();
+    URL.revokeObjectURL(url);
+  }
+
+  ordenarPor(campo: keyof Tarea) {
+    this.tareasFiltradas.sort((a, b) => {
+      if (a[campo] < b[campo]) return -1;
+      if (a[campo] > b[campo]) return 1;
+      return 0;
+    });
+  }
+
+  generarReporte() {
+    const vencidas = this.tareas.filter(t => t.estado === 'pendiente' && this.estaVencida(t.fechaVencimiento)).length;
+    const porPrioridad = {
+      alta: this.tareas.filter(t => t.prioridad === 'alta').length,
+      media: this.tareas.filter(t => t.prioridad === 'media').length,
+      baja: this.tareas.filter(t => t.prioridad === 'baja').length
+    };
+    
+    const reporte = `
+=== REPORTE DE TAREAS ===
+Fecha: ${new Date().toLocaleDateString()}
+
+📊 Estadísticas Generales:
+- Total Tareas: ${this.stats.total}
+- Pendientes: ${this.stats.pendientes}
+- En Progreso: ${this.stats.enProgreso}
+- Completadas: ${this.stats.completadas}
+- Vencidas: ${vencidas}
+
+⚠️ Prioridades:
+- Alta: ${porPrioridad.alta}
+- Media: ${porPrioridad.media}
+- Baja: ${porPrioridad.baja}
+
+🏆 Empleados con más tareas:
+${this.getEmpleadosConMasTareas()}
+
+⏰ Próximos Vencimientos:
+${this.getProximosVencimientos()}
+    `;
+    
+    alert(reporte);
+  }
+
+  getEmpleadosConMasTareas(): string {
+    const conteo: {[key: string]: number} = {};
+    this.tareas.forEach(t => {
+      conteo[t.asignadoA] = (conteo[t.asignadoA] || 0) + 1;
+    });
+    
+    return Object.entries(conteo)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3)
+      .map((e, i) => `${i + 1}. ${e[0]} - ${e[1]} tareas`)
+      .join('\n');
+  }
+
+  getProximosVencimientos(): string {
+    return this.tareas
+      .filter(t => t.estado !== 'completada' && t.estado !== 'cancelada')
+      .sort((a, b) => new Date(a.fechaVencimiento).getTime() - new Date(b.fechaVencimiento).getTime())
+      .slice(0, 5)
+      .map(t => `- ${t.titulo} (${new Date(t.fechaVencimiento).toLocaleDateString()})`)
+      .join('\n');
   }
 }
