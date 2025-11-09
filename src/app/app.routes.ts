@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { Login } from './components/login/login';
+import { Dashboard } from './components/dashboard/dashboard';
 import { Prospectos } from './components/prospectos/prospectos';
 import { Clientes } from './components/clientes/clientes';
 import { Empleados } from './components/empleados/empleados';
@@ -13,35 +14,9 @@ export const routes: Routes = [
   // Login - sin guard
   { path: 'login', component: Login },
   
-  
-  // Prospectos
+  // Dashboard
   { 
-    path: 'prospectos', 
-    component: Prospectos,
+    path: 'dashboard', 
+    component: Dashboard,
     canActivate: [authGuard]
   },
-  
-  // Clientes
-  { 
-    path: 'clientes', 
-    component: Clientes,
-    canActivate: [authGuard]
-  },
-  
-  // Empleados
-  { 
-    path: 'empleados', 
-    component: Empleados,
-    canActivate: [authGuard]
-  },
-  
-  // Tareas
-  { 
-    path: 'tareas', 
-    component: Tareas,
-    canActivate: [authGuard]
-  },
-  
-  // Cualquier otra ruta redirige a login
-  { path: '**', redirectTo: '/login' }
-];
