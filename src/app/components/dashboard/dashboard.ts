@@ -1,6 +1,7 @@
 // src/app/components/dashboard/dashboard.ts
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { Layout } from '../layout/layout';
 
 interface StatCard {
@@ -89,7 +90,26 @@ export class Dashboard implements OnInit {
     }
   ];
 
+  constructor(private router: Router) {}
+
   ngOnInit() {
     // Aquí puedes cargar datos reales cuando tengas el backend
+  }
+
+  // Métodos de navegación para los botones
+  navegarProspectos() {
+    this.router.navigate(['/prospectos']);
+  }
+
+  navegarClientes() {
+    this.router.navigate(['/clientes']);
+  }
+
+  navegarTareas() {
+    this.router.navigate(['/tareas']);
+  }
+
+  generarReporte() {
+    alert('Funcionalidad de reportes en desarrollo');
   }
 }
